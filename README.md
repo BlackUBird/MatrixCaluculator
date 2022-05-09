@@ -1,1 +1,4 @@
-# MatrixCaluculator
+#### MatrixCaluculator
+##### TMCIT 情報通信工学コース5年 数値解析 課題用
+###### 行列の和、積とLU分解を行えます。
+###### TMCIT_T5_NA に比べて簡潔になりました。(構造体の名前が分かりやすい等)
