@@ -42,6 +42,12 @@ bool Matrix2_Mul( Matrix_t FirstMatrix , Matrix_t SecondMatrix , Matrix_t* Resul
 bool Matrix2_Div( Matrix_t FirstMatrix , Matrix_t SecondMatrix , Matrix_t* ResultMatrix );
 //LU分解をする
 bool Matrix2_LUDecomposition( Matrix_t Matrix , Matrix_t* LMatrix , Matrix_t* UMatrix );
+//ガウスの消去法
+int Matrix2_GaussianElimination( Matrix_t CoefficientMatrix , Matrix_t* X_VectorMatrix , Matrix_t VectorMatrix );
+//前進消去
+int Matrix2_ForwardElimination( Matrix_t CoefficientMatrix , Matrix_t VectorMatrix , Matrix_t* ResultCffcMatrix , Matrix_t* ResultVctrMatrix );
+//交代代入
+int Matrix2_BackSubstitution( Matrix_t CoefficientMatrix , Matrix_t* X_VectorMatrix , Matrix_t VectorMatrix );
 
 //終了処理
 void Matrix2_Finalize( Matrix_t* Matrix );

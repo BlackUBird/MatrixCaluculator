@@ -222,6 +222,105 @@ bool Matrix2_LUDecomposition( Matrix_t Matrix , Matrix_t* LMatrix , Matrix_t* UM
 	return (true);
 }
 
+//ガウスの消去法
+int Matrix2_GaussianElimination( Matrix_t CoefficientMatrix ,
+								 Matrix_t* X_VectorMatrix , 
+								 Matrix_t VectorMatrix )
+{
+	//係数行列を上三角行列にしたものを格納
+	Matrix_t CffcMatrix;
+	Matrix2_Initialize( &CffcMatrix , CoefficientMatrix.Rows , CoefficientMatrix.Columns );
+	//前進消去時のベクトルを格納
+	Matrix_t VctrMatrix;
+	Matrix2_Initialize( &VctrMatrix , VectorMatrix.Rows , VectorMatrix.Columns );
+
+	//表示
+	printf( "前進消去前の係数行列\n" );
+	Matrix2_DrawAllElements( CffcMatrix );
+	printf( "前進消去前の解のベクトル\n" );
+	Matrix2_DrawAllElements( VctrMatrix );
+
+	//前進消去
+	printf("前進消去:%d\n" ,Matrix2_ForwardElimination( CoefficientMatrix , VectorMatrix , &CffcMatrix , &VctrMatrix ) );
+	//表示
+	printf( "前進消去後の係数行列\n" );
+	Matrix2_DrawAllElements( CffcMatrix );
+	printf( "前進消去後の解のベクトル\n" );
+	Matrix2_DrawAllElements( VctrMatrix );
+
+	//交代代入
+	Matrix2_BackSubstitution( CffcMatrix , X_VectorMatrix , VctrMatrix );
+
+	return (1);
+}
+//前進消去
+int Matrix2_ForwardElimination( Matrix_t CoefficientMatrix ,
+								Matrix_t VectorMatrix ,
+								Matrix_t* ResultCffcMatrix , 
+								Matrix_t* ResultVctrMatrix )
+{
+	//返却値(最大ループ回数)
+	int cnt = 0;
+
+	//係数行列の結果格納用行列を初期化
+	*ResultCffcMatrix = CoefficientMatrix;
+	//解のベクトルの結果格納用行列を初期化
+	*ResultVctrMatrix = VectorMatrix;
+
+	//係数行列の対角成分の数だけループ
+	for( int k = 0 ; k < CoefficientMatrix.Rows ; k++ )
+	{
+		//対角成分の下からの一番下までループ
+		for( int i = k+1 ; i < CoefficientMatrix.Rows ; i++ )
+		{
+			//現在の行の成分にかかる係数を計算
+			double cffc = CoefficientMatrix.Elements[i][k] / CoefficientMatrix.Elements[k][k];
+
+			//引き算をしていく
+			//対角行列から左端までループ
+			for( int j = k ; j < CoefficientMatrix.Columns ; j++ )
+			{
+				//係数行列を計算
+				ResultCffcMatrix->Elements[i][j] = CoefficientMatrix.Elements[i][j] - cffc * CoefficientMatrix.Elements[k][j];
+				//カウント+1
+				cnt++;
+			}
+
+			//解のベクトルを計算
+			ResultVctrMatrix->Elements[i][0] = VectorMatrix.Elements[i][0] - cffc * VectorMatrix.Elements[k][0];
+		}
+	}
+
+	return (cnt);
+}
+//交代代入
+int Matrix2_BackSubstitution( Matrix_t CoefficientMatrix ,
+							  Matrix_t* X_VectorMatrix , 
+							  Matrix_t VectorMatrix )
+{
+	//返却値(最大ループ回数)
+	int cnt = 0;
+
+	//解の数だけループ(逆順)
+	for( int i = VectorMatrix.Rows - 1 ; i >= 0 ; i-- )
+	{
+		//分母になるモノを計算する
+		double denominator = VectorMatrix.Elements[i][0];
+		//係数行列の右端の成分から対角成分までループ
+		for( int j = CoefficientMatrix.Columns - 1 ; j > i ; j-- )
+		{
+			denominator -= X_VectorMatrix->Elements[j][0] * CoefficientMatrix.Elements[i][j];
+			//ループ回数を記憶
+			cnt++;
+		}
+		//値を確定
+		X_VectorMatrix->Elements[i][0] = denominator / CoefficientMatrix.Elements[i][i];
+	}
+
+	return (cnt);
+}
+
+
 //終了処理
 void Matrix2_Finalize( Matrix_t* Matrix )
 {
